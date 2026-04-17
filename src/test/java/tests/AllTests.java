@@ -14,7 +14,7 @@ public class AllTests extends BaseTest {
         driver.get("https://www.saucedemo.com");
 
         LoginPage login = new LoginPage(driver);
-        login.login("standard_user", "secret_saucee");
+        login.login("standard_user", "secret_sauce");
 
         Assert.assertTrue(driver.findElements(By.className("inventory_list")).size() > 0);
     }
