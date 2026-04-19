@@ -114,10 +114,15 @@ public class AllTests extends BaseTest {
         loginHelper();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
+        // Open Sidebar
         wait.until(ExpectedConditions.elementToBeClickable(By.id("react-burger-menu-btn"))).click();
 
+        // Click Logout - use visibilityOfElementLocated to handle the sliding menu animation
         WebElement logoutLink = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("logout_sidebar_link")));
         logoutLink.click();
+
+        // CRITICAL: Wait for the URL to back to the base page/login before checking for the button
+        wait.until(ExpectedConditions.urlToBe("https://www.saucedemo.com/"));
 
         WebElement loginBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("login-button")));
         Assert.assertTrue(loginBtn.isDisplayed(), "Logout failed - Login button not visible!");

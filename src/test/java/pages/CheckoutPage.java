@@ -36,22 +36,25 @@ public class CheckoutPage {
     WebElement finishBtn;
 
     public void fillDetails(String firstName, String lastName, String zip) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
-        // Wait for fields and fill them
+        // 1. Fill the fields
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("first-name"))).sendKeys(firstName);
         driver.findElement(By.id("last-name")).sendKeys(lastName);
         driver.findElement(By.id("postal-code")).sendKeys(zip);
 
-        // CRITICAL: Wait for and click the Continue button
+        // 2. Click Continue
         WebElement continueBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("continue")));
         continueBtn.click();
+
+        // 3. CRITICAL: Wait for the URL to change to Step Two before returning
+        wait.until(ExpectedConditions.urlContains("checkout-step-two"));
     }
 
     public void completeOrder() {
-        // Ensure the button is actually ready for a click
-        wait.until(ExpectedConditions.elementToBeClickable(finishBtn)).click();
-        // Wait for the final confirmation page
+        // Wait for the Finish button to be visible and clickable
+        WebElement finishBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("finish")));
+        finishBtn.click();
+
+        // Wait for the Complete page to load
         wait.until(ExpectedConditions.urlContains("checkout-complete"));
     }
 }
