@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import pages.*;
 import org.testng.annotations.Listeners;
 import java.time.Duration;
+import org.openqa.selenium.WebElement;
 
 @Listeners(utils.TestListener.class)
 public class AllTests extends BaseTest {
@@ -57,15 +58,15 @@ public class AllTests extends BaseTest {
     public void TC05_CheckoutPage() {
         loginHelper();
         ProductsPage products = new ProductsPage(driver);
-        products.addBackpack(); // MUST add item so checkout is allowed
-        products.openCart();
+
+        // CRITICAL: You MUST add an item before opening the cart,
+        // otherwise SauceDemo flakiness occurs in headless mode.
+        products.addBackpack();
+
+        products.openCart(); // This now has the internal wait we added
 
         CartPage cart = new CartPage(driver);
         cart.clickCheckout();
-
-        // Use a wait here to ensure the URL has actually changed before asserting
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.urlContains("checkout-step-one"));
 
         Assert.assertTrue(driver.getCurrentUrl().contains("checkout-step-one"), "Checkout page didn't load!");
     }
@@ -112,12 +113,20 @@ public class AllTests extends BaseTest {
     @Test(priority = 8)
     public void TC08_LogoutTest() {
         loginHelper();
-        driver.findElement(By.id("react-burger-menu-btn")).click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("logout_sidebar_link"))).click();
+        // 1. Click the Burger Menu
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("react-burger-menu-btn"))).click();
 
-        Assert.assertTrue(driver.findElements(By.id("login-button")).size() > 0, "Logout failed!");
+        // 2. WAIT FOR VISIBILITY (Not just presence)
+        // This waits for the CSS animation to finish sliding the menu out
+        WebElement logoutLink = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("logout_sidebar_link")));
+        logoutLink.click();
+
+        // 3. Verify redirection to login page
+        wait.until(ExpectedConditions.urlContains("saucedemo.com"));
+        boolean isLoginButtonPresent = driver.findElements(By.id("login-button")).size() > 0;
+        Assert.assertTrue(isLoginButtonPresent, "Logout failed - Login button not found!");
     }
 
     // 🔹 TC09 - Invalid Login: Verifies that a locked-out or incorrect user receives the appropriate error message.

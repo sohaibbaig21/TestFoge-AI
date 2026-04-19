@@ -29,12 +29,12 @@ public class ProductsPage {
         wait.until(ExpectedConditions.elementToBeClickable(bike)).click();
     }
 
-    public void openCart() {
-        // Wait for the cart icon to be ready
-        WebElement cartIcon = wait.until(ExpectedConditions.elementToBeClickable(cart));
-        cartIcon.click();
 
-        // CRITICAL: Wait for the URL to change so the next page is actually loaded
+    public void openCart() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        // Use the class name "shopping_cart_link"
+        wait.until(ExpectedConditions.elementToBeClickable(By.className("shopping_cart_link"))).click();
+        // Force wait for navigation
         wait.until(ExpectedConditions.urlContains("cart.html"));
     }
 }
