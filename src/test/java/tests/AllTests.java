@@ -60,13 +60,18 @@ public class AllTests extends BaseTest {
     public void TC06_FillCheckout() {
         loginHelper();
         ProductsPage products = new ProductsPage(driver);
+        products.addBackpack(); // Ensure there's an item, otherwise checkout might hang
         products.openCart();
+
         CartPage cart = new CartPage(driver);
         cart.clickCheckout();
 
         CheckoutPage checkout = new CheckoutPage(driver);
         checkout.fillDetails("Sohaib", "Baig", "75500");
-        Assert.assertTrue(driver.getCurrentUrl().contains("checkout-step-two"), "Failed to progress to step two!");
+
+        // Check for the 'Checkout: Overview' header text
+        Assert.assertTrue(driver.getCurrentUrl().contains("checkout-step-two"),
+                "Failed to transition to the Overview page!");
     }
 
     @Test(priority = 7)

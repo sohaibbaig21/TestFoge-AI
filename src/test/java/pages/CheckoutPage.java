@@ -35,15 +35,23 @@ public class CheckoutPage {
     WebElement finishBtn;
 
     public void fillDetails(String f, String l, String p) {
-        // This wait is CRITICAL for GitHub Actions
         wait.until(ExpectedConditions.visibilityOf(firstName));
+        firstName.clear(); // Good practice to clear before typing
         firstName.sendKeys(f);
+        lastName.clear();
         lastName.sendKeys(l);
+        postalCode.clear();
         postalCode.sendKeys(p);
-        continueBtn.click(); // Click continue inside here to progress the state
+
+        continueBtn.click();
+
+        wait.until(ExpectedConditions.urlContains("checkout-step-two"));
     }
 
     public void completeOrder() {
+        // Ensure the button is actually ready for a click
         wait.until(ExpectedConditions.elementToBeClickable(finishBtn)).click();
+        // Wait for the final confirmation page
+        wait.until(ExpectedConditions.urlContains("checkout-complete"));
     }
 }
