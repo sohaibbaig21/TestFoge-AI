@@ -5,7 +5,9 @@ import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.*;
+import org.testng.annotations.Listeners;
 
+@Listeners(utils.TestListener.class)
 public class AllTests extends BaseTest {
 
     // 🔹 TC01 - Login Test
