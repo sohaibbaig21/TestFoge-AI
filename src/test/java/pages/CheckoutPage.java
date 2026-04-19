@@ -34,18 +34,17 @@ public class CheckoutPage {
     @FindBy(id = "finish")
     WebElement finishBtn;
 
-    public void fillDetails(String f, String l, String p) {
-        wait.until(ExpectedConditions.visibilityOf(firstName));
-        firstName.clear(); // Good practice to clear before typing
-        firstName.sendKeys(f);
-        lastName.clear();
-        lastName.sendKeys(l);
-        postalCode.clear();
-        postalCode.sendKeys(p);
+    public void fillDetails(String firstName, String lastName, String zip) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
+        // Wait for fields and fill them
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("first-name"))).sendKeys(firstName);
+        driver.findElement(By.id("last-name")).sendKeys(lastName);
+        driver.findElement(By.id("postal-code")).sendKeys(zip);
+
+        // CRITICAL: Wait for and click the Continue button
+        WebElement continueBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("continue")));
         continueBtn.click();
-
-        wait.until(ExpectedConditions.urlContains("checkout-step-two"));
     }
 
     public void completeOrder() {
