@@ -2,13 +2,19 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import java.time.Duration;
 
 public class ProductsPage {
 
     WebDriver driver;
+    WebDriverWait wait;
 
     public ProductsPage(WebDriver driver) {
         this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
     By backpack = By.id("add-to-cart-sauce-labs-backpack");
@@ -16,14 +22,19 @@ public class ProductsPage {
     By cart = By.className("shopping_cart_link");
 
     public void addBackpack() {
-        driver.findElement(backpack).click();
+        wait.until(ExpectedConditions.elementToBeClickable(backpack)).click();
     }
 
     public void addBike() {
-        driver.findElement(bike).click();
+        wait.until(ExpectedConditions.elementToBeClickable(bike)).click();
     }
 
     public void openCart() {
-        driver.findElement(cart).click();
+        // Wait for the cart icon to be ready
+        WebElement cartIcon = wait.until(ExpectedConditions.elementToBeClickable(cart));
+        cartIcon.click();
+
+        // CRITICAL: Wait for the URL to change so the next page is actually loaded
+        wait.until(ExpectedConditions.urlContains("cart.html"));
     }
 }
