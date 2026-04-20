@@ -41,7 +41,22 @@ public class AllTests extends BaseTest {
         new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.urlToBe("https://www.saucedemo.com/"));
         Assert.assertEquals(driver.getCurrentUrl(), "https://www.saucedemo.com/");
     }
+    // TEST 3: ADD TO CART & OPEN CART
+    @Test(priority = 3)
+    public void TC02_AddBackpackAndOpenCart() {
+        loginHelper();
 
+        // 1. Add Backpack using direct ID click via JS
+        ((JavascriptExecutor) driver).executeScript("document.getElementById('add-to-cart-sauce-labs-backpack').click();");
+
+        // 2. Open Cart
+        ProductsPage products = new ProductsPage(driver);
+        products.openCart(); // Ensure this method in ProductsPage uses JavascriptExecutor too!
+
+        // 3. Verify URL
+        new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.urlContains("cart"));
+        Assert.assertTrue(driver.getCurrentUrl().contains("cart"), "Failed to navigate to cart");
+    }
     /* Commented out for incremental testing
 
     @Test(priority = 3)
