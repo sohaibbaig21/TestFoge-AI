@@ -65,4 +65,28 @@ public class AllTests extends BaseTest {
     @Test(priority = 4)
     public void TC03_CheckoutFlow() { ... }
     */
+    // TEST 4: CHECKOUT FORM & OVERVIEW
+    @Test(priority = 4)
+    public void TC03_CheckoutFlow() {
+        loginHelper();
+
+        // 1. Direct navigation to Step One to save time and reduce flakiness
+        driver.get("https://www.saucedemo.com/checkout-step-one.html");
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        // 2. Fill details with explicit waits for each field
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("first-name"))).sendKeys("Sohaib");
+        driver.findElement(By.id("last-name")).sendKeys("Baig");
+        driver.findElement(By.id("postal-code")).sendKeys("75500");
+
+        // 3. Force click the Continue button
+        WebElement continueBtn = driver.findElement(By.id("continue"));
+        js.executeScript("arguments[0].click();", continueBtn);
+
+        // 4. Verify we reached Step Two (Overview)
+        boolean reachedStepTwo = wait.until(ExpectedConditions.urlContains("checkout-step-two"));
+        Assert.assertTrue(reachedStepTwo, "Failed to reach the Overview page");
+    }
 }
