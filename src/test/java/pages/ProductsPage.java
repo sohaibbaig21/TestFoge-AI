@@ -30,11 +30,19 @@ public class ProductsPage {
     }
 
 
+
     public void openCart() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        // Use the class name "shopping_cart_link"
-        wait.until(ExpectedConditions.elementToBeClickable(By.className("shopping_cart_link"))).click();
-        // Force wait for navigation
+
+        // 1. Locate the cart link
+        WebElement cartLink = wait.until(ExpectedConditions.presenceOfElementLocated(By.className("shopping_cart_link")));
+
+        // 2. Force the click using JavaScript
+        // This ensures the click registers even if the element is slightly off-screen or animating
+        org.openqa.selenium.JavascriptExecutor js = (org.openqa.selenium.JavascriptExecutor) driver;
+        js.executeScript("arguments[0].click();", cartLink);
+
+        // 3. Wait for the URL change
         wait.until(ExpectedConditions.urlContains("cart.html"));
     }
 }
