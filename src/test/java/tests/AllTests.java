@@ -34,7 +34,11 @@ public class AllTests extends BaseTest {
         loginHelper();
         ProductsPage products = new ProductsPage(driver);
         products.addBackpack();
-        Assert.assertTrue(driver.getPageSource().contains("Remove"), "Backpack not added!");
+
+        // Explicit wait for the button to flip to 'Remove'
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        boolean isRemovedVisible = wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("remove-sauce-labs-backpack"), "Remove"));
+        Assert.assertTrue(isRemovedVisible, "Backpack not added!");
     }
 
     @Test(priority = 3)
@@ -42,7 +46,10 @@ public class AllTests extends BaseTest {
         loginHelper();
         ProductsPage products = new ProductsPage(driver);
         products.addBike();
-        Assert.assertTrue(driver.getPageSource().contains("Remove"), "Bike light not added!");
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        boolean isRemovedVisible = wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("remove-sauce-labs-bike-light"), "Remove"));
+        Assert.assertTrue(isRemovedVisible, "Bike light not added!");
     }
 
     @Test(priority = 4)
