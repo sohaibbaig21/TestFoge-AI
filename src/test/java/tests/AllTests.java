@@ -52,15 +52,21 @@ public class AllTests extends BaseTest {
         products.openCart();
         Assert.assertTrue(driver.getCurrentUrl().contains("cart"), "Cart page didn't load!");
     }
-
     @Test(priority = 5)
     public void TC05_CheckoutPage() {
         loginHelper();
         ProductsPage products = new ProductsPage(driver);
         products.addBackpack();
         products.openCart();
-        new CartPage(driver).clickCheckout();
-        Assert.assertTrue(driver.getCurrentUrl().contains("checkout-step-one"), "Checkout page didn't load!");
+
+        CartPage cart = new CartPage(driver);
+        cart.clickCheckout();
+
+        // Use a wait instead of a direct Assert on the URL
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        boolean isCorrectUrl = wait.until(ExpectedConditions.urlContains("checkout-step-one"));
+
+        Assert.assertTrue(isCorrectUrl, "Checkout page didn't load!");
     }
 
     @Test(priority = 6)
