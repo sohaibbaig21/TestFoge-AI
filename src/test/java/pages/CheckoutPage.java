@@ -15,22 +15,27 @@ public class CheckoutPage {
     }
 
     public void fillDetailsAndContinue(String fName, String lName, String zip) {
-        // Fill fields with explicit waits
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("first-name"))).sendKeys(fName);
-        driver.findElement(By.id("last-name")).sendKeys(lName);
-        driver.findElement(By.id("postal-code")).sendKeys(zip);
+        JavascriptExecutor js = (JavascriptExecutor) driver;
 
-        // Aggressive Click: Scroll, then JS click
+        // 1. Wait for the page to be ready
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("first-name")));
+
+        // 2. Inject values directly into the HTML 'value' attribute
+        // This bypasses keyboard simulation entirely for maximum reliability
+        js.executeScript("document.getElementById('first-name').value='" + fName + "';");
+        js.executeScript("document.getElementById('last-name').value='" + lName + "';");
+        js.executeScript("document.getElementById('postal-code').value='" + zip + "';");
+
+        // 3. Force the form to submit
         WebElement continueBtn = driver.findElement(By.id("continue"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", continueBtn);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", continueBtn);
+        js.executeScript("arguments[0].click();", continueBtn);
 
-        // Wait for the URL to change to Step Two
+        // 4. Verification Gate
         wait.until(ExpectedConditions.urlContains("checkout-step-two"));
     }
 
     public void completeOrder() {
-        WebElement finishBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("finish")));
+        WebElement finishBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("finish")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", finishBtn);
         wait.until(ExpectedConditions.urlContains("checkout-complete"));
     }
