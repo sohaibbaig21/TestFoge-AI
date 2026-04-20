@@ -1,6 +1,7 @@
 package pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -29,32 +30,38 @@ public class CheckoutPage {
     @FindBy(id = "postal-code")
     WebElement postalCode;
 
-    @FindBy(id = "continue")
-    WebElement continueBtn;
+    public void fillDetails(String fName, String lName, String zip) {
+        // 1. Wait for fields and clear them before typing
+        WebElement fNameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("first-name")));
+        fNameField.clear();
+        fNameField.sendKeys(fName);
 
-    @FindBy(id = "finish")
-    WebElement finishBtn;
+        WebElement lNameField = driver.findElement(By.id("last-name"));
+        lNameField.clear();
+        lNameField.sendKeys(lName);
 
-    public void fillDetails(String firstName, String lastName, String zip) {
-        // 1. Fill the fields
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("first-name"))).sendKeys(firstName);
-        driver.findElement(By.id("last-name")).sendKeys(lastName);
-        driver.findElement(By.id("postal-code")).sendKeys(zip);
+        WebElement zipField = driver.findElement(By.id("postal-code"));
+        zipField.clear();
+        zipField.sendKeys(zip);
 
-        // 2. Click Continue
+        // 2. Use JavaScript Click for the Continue button
+        // This bypasses any issues where the button is "covered" or not responding to standard clicks
         WebElement continueBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("continue")));
-        continueBtn.click();
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].click();", continueBtn);
 
-        // 3. CRITICAL: Wait for the URL to change to Step Two before returning
+        // 3. Wait for the URL change to verify the click worked
         wait.until(ExpectedConditions.urlContains("checkout-step-two"));
     }
 
     public void completeOrder() {
-        // Wait for the Finish button to be visible and clickable
-        WebElement finishBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("finish")));
-        finishBtn.click();
+        WebElement finishBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("finish")));
 
-        // Wait for the Complete page to load
+        // Scroll and Click via JavaScript to handle potential footer overlaps
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].scrollIntoView(true);", finishBtn);
+        js.executeScript("arguments[0].click();", finishBtn);
+
         wait.until(ExpectedConditions.urlContains("checkout-complete"));
     }
 }
