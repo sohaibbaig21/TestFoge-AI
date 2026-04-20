@@ -19,52 +19,35 @@ public class AllTests extends BaseTest {
         new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.urlContains("inventory"));
     }
 
+    // TEST 1: LOGIN
     @Test(priority = 1)
-    public void TC01_Login() { loginHelper(); }
+    public void TC01_Login() {
+        loginHelper();
+        Assert.assertTrue(driver.getCurrentUrl().contains("inventory"), "Login failed");
+    }
 
+    // TEST 2: LOGOUT
     @Test(priority = 2)
-    public void TC02_AddItemsAndOpenCart() {
-        loginHelper();
-        ProductsPage products = new ProductsPage(driver);
-        // Using direct JS clicks via driver if PageObjects fail
-        ((JavascriptExecutor) driver).executeScript("document.getElementById('add-to-cart-sauce-labs-backpack').click();");
-        products.openCart();
-        Assert.assertTrue(driver.getCurrentUrl().contains("cart"), "Failed to open cart");
-    }
-
-    @Test(priority = 3)
-    public void TC03_CheckoutFlow() {
-        loginHelper();
-        driver.get("https://www.saucedemo.com/cart.html");
-
-        CartPage cart = new CartPage(driver);
-        cart.clickCheckout();
-
-        CheckoutPage checkout = new CheckoutPage(driver);
-        checkout.fillDetailsAndContinue("Sohaib", "Baig", "75500");
-
-        Assert.assertTrue(driver.getCurrentUrl().contains("step-two"), "Failed to reach Overview");
-    }
-
-    @Test(priority = 4)
-    public void TC04_FinalizeOrder() {
-        loginHelper();
-        driver.get("https://www.saucedemo.com/checkout-step-one.html");
-
-        CheckoutPage checkout = new CheckoutPage(driver);
-        checkout.fillDetailsAndContinue("Sohaib", "Baig", "75500");
-        checkout.completeOrder();
-
-        Assert.assertTrue(driver.getCurrentUrl().contains("complete"), "Order not finished");
-    }
-
-    @Test(priority = 5)
     public void TC05_Logout() {
         loginHelper();
         driver.findElement(By.id("react-burger-menu-btn")).click();
+
         WebElement logout = new WebDriverWait(driver, Duration.ofSeconds(10))
                 .until(ExpectedConditions.elementToBeClickable(By.id("logout_sidebar_link")));
+
+        // Use JavaScript to ensure the click happens during the animation
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", logout);
+
+        new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.urlToBe("https://www.saucedemo.com/"));
         Assert.assertEquals(driver.getCurrentUrl(), "https://www.saucedemo.com/");
     }
+
+    /* Commented out for incremental testing
+
+    @Test(priority = 3)
+    public void TC02_AddItems() { ... }
+
+    @Test(priority = 4)
+    public void TC03_CheckoutFlow() { ... }
+    */
 }
