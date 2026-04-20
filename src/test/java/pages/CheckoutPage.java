@@ -31,26 +31,33 @@ public class CheckoutPage {
     WebElement postalCode;
 
     public void fillDetails(String fName, String lName, String zip) {
-        // 1. Wait for fields and clear them before typing
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        // 1. Wait for and fill the First Name
         WebElement fNameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("first-name")));
         fNameField.clear();
         fNameField.sendKeys(fName);
 
+        // 2. Fill the Last Name
         WebElement lNameField = driver.findElement(By.id("last-name"));
         lNameField.clear();
         lNameField.sendKeys(lName);
 
+        // 3. Fill the Zip and use .submit() instead of clicking the button
+        // .submit() is a Selenium method that works on any element within a <form>
         WebElement zipField = driver.findElement(By.id("postal-code"));
         zipField.clear();
         zipField.sendKeys(zip);
 
-        // 2. Use JavaScript Click for the Continue button
-        // This bypasses any issues where the button is "covered" or not responding to standard clicks
-        WebElement continueBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("continue")));
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].click();", continueBtn);
+        // Fallback: If submit doesn't trigger, we use the JS click on the continue button
+        try {
+            zipField.submit();
+        } catch (Exception e) {
+            WebElement continueBtn = driver.findElement(By.id("continue"));
+            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].click();", continueBtn);
+        }
 
-        // 3. Wait for the URL change to verify the click worked
+        // 4. Wait for URL change to Step Two
         wait.until(ExpectedConditions.urlContains("checkout-step-two"));
     }
 
